@@ -10,10 +10,17 @@ import UIKit
 class PhotosViewController: UIViewController {
     
     var networkDataFetcher = NetworkDataFetcher()
+    
     private var timer: Timer?
     
+    private var photos = [UnsplashPhoto]()
+    
+    private let itemsPerRow: CGFloat = 2
+    
+    private let sectionInserts = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
+    
     private let collectionView: UICollectionView = {
-        let celSize = CGSize(width: 20, height: 20)
+        let celSize = CGSize(width: (UIScreen.main.bounds.width - 3*8)/2, height: (UIScreen.main.bounds.width - 3*8)/2)
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 8
         layout.minimumInteritemSpacing = 8
@@ -21,7 +28,7 @@ class PhotosViewController: UIViewController {
         layout.itemSize = celSize
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = .orange
+        collectionView.backgroundColor = .white
         return collectionView
     }()
         
@@ -29,16 +36,27 @@ class PhotosViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .white
         navigationController?.navigationBar.isTranslucent = false
+        getRandomPhotos()
         setupSubviews()
         setupCollectionView()
         setupNavigationController()
         setupSearchBar()
     }
     
+    private func getRandomPhotos() {
+        networkDataFetcher.fetchRandomPhotos { [weak self] randomPhotos in
+            guard let fetchedPhotos = randomPhotos else { return }
+            self?.photos = fetchedPhotos
+            self?.collectionView.reloadData()
+        }
+    }
+    
     private func setupCollectionView() {
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "Cell")
+        collectionView.register(PhotosCell.self, forCellWithReuseIdentifier: PhotosCell.reuseIdentifier)
+        collectionView.layoutMargins = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        collectionView.contentInsetAdjustmentBehavior = .automatic
     }
     
     private func setupNavigationController() {
@@ -78,13 +96,20 @@ extension PhotosViewController: UICollectionViewDelegate, UICollectionViewDataSo
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 5
+        return photos.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotosCell.reuseIdentifier, for: indexPath) as! PhotosCell
+        let unsplashPhoto = photos[indexPath.item]
+        cell.unsplashPhoto = unsplashPhoto
         cell.backgroundColor = .red
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let detailedInformation = DetailedInformationViewController(unsplashPhoto: photos[indexPath.item])
+        navigationController?.pushViewController(detailedInformation, animated: true)
     }
 }
 
@@ -96,14 +121,32 @@ extension PhotosViewController: UISearchBarDelegate {
         print(searchText)
         
         timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { [weak self] _ in
-            self?.networkDataFetcher.fetchImages(searchTerm: searchText) { searchResults in
-                searchResults?.results.map { photo in
-                    print(photo.urls)
-                }
+            self?.networkDataFetcher.fetchImages(searchTerm: searchText) { [weak self] searchResults in
+                guard let fetchedPhotos = searchResults else { return }
+                self?.photos = fetchedPhotos.results
+                self?.collectionView.reloadData()
             }
         })
-        
     }
-    
 }
 
+// MARK: - UICollectionViewDelegateFlowLayout
+extension PhotosViewController: UICollectionViewDelegateFlowLayout {
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let photo = photos[indexPath.item]
+        let paddingSpace = sectionInserts.left * (itemsPerRow + 1)
+        let availableWidth = view.frame.width - paddingSpace
+        let widthPerItem = availableWidth / itemsPerRow
+        let height = CGFloat(photo.height) * widthPerItem / CGFloat(photo.width)
+        return CGSize(width: widthPerItem, height: height)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return sectionInserts
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return sectionInserts.left
+    }
+}

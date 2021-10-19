@@ -9,10 +9,27 @@ import Foundation
 
 class NetworkService {
     
-    func request(searchTerm: String, completion: @escaping (Data?, Error?) -> Void) {
-        let parameters = self.prepareParameters(searchTerm: searchTerm)
-        let url = self.url(parameters: parameters)
-        print(url)
+    func searchRequest(searchTerm: String, completion: @escaping (Data?, Error?) -> Void) {
+        let parameters = self.prepareSearchParameters(searchTerm: searchTerm)
+        let url = self.searchUrl(parameters: parameters)
+        var request = URLRequest(url: url)
+        request.allHTTPHeaderFields = prepareHeader()
+        request.httpMethod = "get"
+        let task = createDataTask(from: request, completion: completion)
+        task.resume()
+    }
+    
+    func photoDetailsRequest(photoId: String, completion: @escaping (Data?, Error?) -> Void) {
+        let url = self.getPhotoUrl(photoId: photoId)
+        var request = URLRequest(url: url)
+        request.allHTTPHeaderFields = prepareHeader()
+        request.httpMethod = "get"
+        let task = createDataTask(from: request, completion: completion)
+        task.resume()
+    }
+    
+    func randomPhotoRequest(completion: @escaping (Data?, Error?) -> Void) {
+        let url = self.randomPhotoUrl()
         var request = URLRequest(url: url)
         request.allHTTPHeaderFields = prepareHeader()
         request.httpMethod = "get"
@@ -26,7 +43,7 @@ class NetworkService {
         return headers
     }
     
-    private func prepareParameters(searchTerm: String?) -> [String: String] {
+    private func prepareSearchParameters(searchTerm: String?) -> [String: String] {
         var parameters = [String: String]()
         parameters["query"] = searchTerm
         parameters["page"] = String(1)
@@ -34,7 +51,7 @@ class NetworkService {
         return parameters
     }
     
-    private func url(parameters: [String : String]) -> URL {
+    private func searchUrl(parameters: [String : String]) -> URL {
         var components = URLComponents()
         components.scheme = "https"
         components.host = "api.unsplash.com"
@@ -42,6 +59,22 @@ class NetworkService {
         components.queryItems = parameters.map {
             URLQueryItem(name: $0, value: $1)
         }
+        return components.url!
+    }
+    
+    private func getPhotoUrl(photoId: String) -> URL {
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = "api.unsplash.com"
+        components.path = "/photos/\(photoId)"
+        return components.url!
+    }
+    
+    private func randomPhotoUrl() -> URL {
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = "api.unsplash.com"
+        components.path = "/photos"
         return components.url!
     }
     

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SDWebImage
 
 class PhotosCell: UICollectionViewCell {
     
@@ -19,13 +20,13 @@ class PhotosCell: UICollectionViewCell {
         return imageView
     }()
     
-    private let checkMark: UIImageView = {
-        let imageView = UIImageView()
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.alpha = 0
-        imageView.image = UIImage(systemName: "checkmark")
-        return imageView
-    }()
+    var unsplashPhoto: UnsplashPhoto! {
+        didSet {
+            let photoUrl = unsplashPhoto.urls.regular
+            guard let url = URL(string: photoUrl) else { return }
+            photoImageView.sd_setImage(with: url, completed: nil)
+        }
+    }
     
     override var isSelected: Bool {
         didSet {
@@ -50,21 +51,16 @@ class PhotosCell: UICollectionViewCell {
     
     private func updateSelectedCell() {
         photoImageView.alpha = isSelected ? 0.7 : 1
-        checkMark.alpha = isSelected ? 1 : 0
     }
     
     private func setupSubviews() {
         contentView.addSubview(photoImageView)
-        contentView.addSubview(checkMark)
         
         let constraints = [
             photoImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
             photoImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             photoImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            photoImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-            
-            checkMark.bottomAnchor.constraint(equalTo: photoImageView.bottomAnchor, constant: -8),
-            checkMark.trailingAnchor.constraint(equalTo: photoImageView.trailingAnchor, constant: -8)
+            photoImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         ]
         
         NSLayoutConstraint.activate(constraints)
