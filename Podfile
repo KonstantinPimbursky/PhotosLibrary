@@ -7,5 +7,6 @@ target 'PhotosLibrary' do
 
   # Pods for PhotosLibrary
 pod 'SDWebImage', '~> 5.0'
+pod 'RealmSwift', '~>10'
 
 end

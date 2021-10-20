@@ -12,6 +12,7 @@ class DetailedInformationViewController: UIViewController {
 
 // MARK: - PROPERTIES
     private let networkDataFetcher = NetworkDataFetcher()
+    private let realmService = RealmDataBaseService()
     
     private let unsplashPhoto: UnsplashPhoto
     private var photoDetails: PhotoDetails? {
@@ -143,19 +144,23 @@ class DetailedInformationViewController: UIViewController {
     
     @objc private func favouriteButtonTapped() {
         let imageConfiguration = UIImage.SymbolConfiguration(scale: .large)
+        guard let photo = photoDetails else { return }
         if favouriteButton.currentImage == UIImage(systemName: "heart", withConfiguration: imageConfiguration) {
-            let image = UIImage(systemName: "heart.fill", withConfiguration: imageConfiguration)
-            favouriteButton.setImage(image, for: .normal)
-            favouriteButton.tintColor = .systemRed
-        } else {
-            let image = UIImage(systemName: "heart", withConfiguration: imageConfiguration)
-            favouriteButton.setImage(image, for: .normal)
-            favouriteButton.tintColor = .systemGray
+            self.photoIsLiked()
+            realmService.savePhoto(id: photo.id, url: photo.urls.small, userName: photo.user.name)
         }
+    }
+    
+    private func photoIsLiked() {
+        let imageConfiguration = UIImage.SymbolConfiguration(scale: .large)
+        let image = UIImage(systemName: "heart.fill", withConfiguration: imageConfiguration)
+        favouriteButton.setImage(image, for: .normal)
+        favouriteButton.tintColor = .systemRed
     }
     
     private func fillLabels() {
         guard let photo = photoDetails else { return }
+        let savedPhotos = realmService.getSavedPhotos()
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
         let date = formatter.date(from: photo.createdAt)!
@@ -173,6 +178,9 @@ class DetailedInformationViewController: UIViewController {
             } else {
                 locationLabel.text = "-"
             }
+        }
+        if savedPhotos.contains(where: { $0.id == photo.id}) {
+            self.photoIsLiked()
         }
     }
     
