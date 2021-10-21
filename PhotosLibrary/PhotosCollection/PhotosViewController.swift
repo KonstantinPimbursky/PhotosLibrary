@@ -11,6 +11,8 @@ class PhotosViewController: UIViewController {
     
     var networkDataFetcher = NetworkDataFetcher()
     
+    private let coordinator: Coordinator
+    
     private var timer: Timer?
     
     private var photos = [UnsplashPhoto]()
@@ -31,6 +33,15 @@ class PhotosViewController: UIViewController {
         collectionView.backgroundColor = .white
         return collectionView
     }()
+    
+    init(coordinator: Coordinator) {
+        self.coordinator = coordinator
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
         
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -108,8 +119,8 @@ extension PhotosViewController: UICollectionViewDelegate, UICollectionViewDataSo
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let detailedInformation = DetailedInformationViewController(unsplashPhoto: photos[indexPath.item])
-        navigationController?.pushViewController(detailedInformation, animated: true)
+        coordinator.showDetailedViewController(photoId: photos[indexPath.item].id,
+                                               profileImageUrl: photos[indexPath.item].user.profileImage.small)
     }
 }
 

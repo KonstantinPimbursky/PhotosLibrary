@@ -13,11 +13,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         if let windowScene = scene as? UIWindowScene {
-                let window = UIWindow(windowScene: windowScene)
-                window.backgroundColor = .white
-                window.rootViewController = MainTabBarController()
-                self.window = window
-                window.makeKeyAndVisible()
+            let window = UIWindow(windowScene: windowScene)
+            let tabBarController = MainTabBarController()
+            let coordinator = MainCoordinator(tabBarController: tabBarController)
+            coordinator.start()
+            window.backgroundColor = .white
+            window.rootViewController = tabBarController
+            self.window = window
+            window.makeKeyAndVisible()
         }
     }
 

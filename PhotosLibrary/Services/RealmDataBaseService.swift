@@ -13,14 +13,17 @@ class PhotoRealmObject: Object {
     @Persisted var id: String
     @Persisted var url: String
     @Persisted var userName: String
+    @Persisted var userProfileUrl: String
     
     convenience init(id: String,
                      url: String,
-                     userName: String) {
+                     userName: String,
+                     userProfileUrl: String) {
         self.init()
         self.id = id
         self.url = url
         self.userName = userName
+        self.userProfileUrl = userProfileUrl
     }
 }
 
@@ -29,8 +32,8 @@ class RealmDataBaseService {
     
     private let localRealm = try! Realm()
     
-    func savePhoto(id: String, url: String, userName: String) {
-        let photo = PhotoRealmObject(id: id, url: url, userName: userName)
+    func savePhoto(id: String, url: String, userName: String, userProfileUrl: String) {
+        let photo = PhotoRealmObject(id: id, url: url, userName: userName, userProfileUrl: userProfileUrl)
         try! localRealm.write {
             localRealm.add(photo)
         }
@@ -39,6 +42,15 @@ class RealmDataBaseService {
     func getSavedPhotos() -> [PhotoRealmObject] {
         let savedPhotos = localRealm.objects(PhotoRealmObject.self).toArray()
         return savedPhotos
+    }
+    
+    func deletePhoto(id: String) {
+        let savedPhotos = localRealm.objects(PhotoRealmObject.self)
+        let predicate = NSPredicate(format: "id == %@", id)
+        let findPhoto = savedPhotos.filter(predicate)
+        try! localRealm.write {
+            localRealm.delete(findPhoto)
+        }
     }
     
 }

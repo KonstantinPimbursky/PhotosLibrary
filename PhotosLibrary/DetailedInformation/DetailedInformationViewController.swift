@@ -14,8 +14,8 @@ class DetailedInformationViewController: UIViewController {
     private let networkDataFetcher = NetworkDataFetcher()
     private let realmService = RealmDataBaseService()
     
-    private let unsplashPhoto: UnsplashPhoto
-    private var photoDetails: PhotoDetails? {
+    private let profileImageUrl: String
+    private var photoDetails: PhotoDetails! {
         didSet {
             fillLabels()
         }
@@ -29,8 +29,8 @@ class DetailedInformationViewController: UIViewController {
         return scrollView
     }()
     
-    private let photoImageView: UIImageView = {
-        let imageView = UIImageView()
+    private let photoImageView: ScaledHeightImageView = {
+        let imageView = ScaledHeightImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.contentMode = .scaleAspectFit
         return imageView
@@ -121,12 +121,14 @@ class DetailedInformationViewController: UIViewController {
         return button
     }()
     
+    var delegate: ReloadData?
+    
 // MARK: - INIT
     
-    init(unsplashPhoto: UnsplashPhoto) {
-        self.unsplashPhoto = unsplashPhoto
+    init(photoId: String, profileImageUrl: String) {
+        self.profileImageUrl = profileImageUrl
         super.init(nibName: nil, bundle: nil)
-        networkDataFetcher.fetchPhotoDetails(photoId: unsplashPhoto.id) { [weak self] photo in
+        networkDataFetcher.fetchPhotoDetails(photoId: photoId) { [weak self] photo in
             self?.photoDetails = photo
         }
     }
@@ -145,9 +147,18 @@ class DetailedInformationViewController: UIViewController {
     @objc private func favouriteButtonTapped() {
         let imageConfiguration = UIImage.SymbolConfiguration(scale: .large)
         guard let photo = photoDetails else { return }
+        guard delegate != nil else { return }
         if favouriteButton.currentImage == UIImage(systemName: "heart", withConfiguration: imageConfiguration) {
             self.photoIsLiked()
-            realmService.savePhoto(id: photo.id, url: photo.urls.small, userName: photo.user.name)
+            realmService.savePhoto(id: photo.id,
+                                   url: photo.urls.small,
+                                   userName: photo.user.name,
+                                   userProfileUrl: profileImageUrl)
+            delegate!.reloadData()
+        } else {
+            self.photoIsUnliked()
+            realmService.deletePhoto(id: photo.id)
+            delegate!.reloadData()
         }
     }
     
@@ -158,6 +169,13 @@ class DetailedInformationViewController: UIViewController {
         favouriteButton.tintColor = .systemRed
     }
     
+    private func photoIsUnliked() {
+        let imageConfiguration = UIImage.SymbolConfiguration(scale: .large)
+        let image = UIImage(systemName: "heart", withConfiguration: imageConfiguration)
+        favouriteButton.setImage(image, for: .normal)
+        favouriteButton.tintColor = .systemGray
+    }
+    
     private func fillLabels() {
         guard let photo = photoDetails else { return }
         let savedPhotos = realmService.getSavedPhotos()
@@ -165,9 +183,9 @@ class DetailedInformationViewController: UIViewController {
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
         let date = formatter.date(from: photo.createdAt)!
         formatter.dateFormat = "dd.MM.yyyy"
-        userProfileImageView.sd_setImage(with: URL(string: unsplashPhoto.user.profileImage.small), completed: nil)
-        photoImageView.sd_setImage(with: URL(string: unsplashPhoto.urls.regular), completed: nil)
-        authorLabel.text = unsplashPhoto.user.name
+        userProfileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
+        photoImageView.sd_setImage(with: URL(string: photoDetails.urls.regular), completed: nil)
+        authorLabel.text = photoDetails.user.name
         downloadsLabel.text = "\(photo.downloads)"
         createdDateLabel.text = formatter.string(from: date)
         if photo.location.city != nil {
@@ -251,16 +269,23 @@ class DetailedInformationViewController: UIViewController {
 
 }
 
-extension UIImageView {
-    open override var intrinsicContentSize: CGSize {
+// MARK: - ScaledHeightImageView
+class ScaledHeightImageView: UIImageView {
+
+    override var intrinsicContentSize: CGSize {
+
         if let myImage = self.image {
             let myImageWidth = myImage.size.width
             let myImageHeight = myImage.size.height
             let myViewWidth = self.frame.size.width
+
             let ratio = myViewWidth/myImageWidth
             let scaledHeight = myImageHeight * ratio
+
             return CGSize(width: myViewWidth, height: scaledHeight)
         }
+
         return CGSize(width: -1.0, height: -1.0)
     }
+
 }
