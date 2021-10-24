@@ -21,15 +21,17 @@ class PhotosViewController: UIViewController {
     
     private let sectionInserts = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
     
-    private let collectionView: UICollectionView = {
-        let celSize = CGSize(width: (UIScreen.main.bounds.width - 3*8)/2, height: (UIScreen.main.bounds.width - 3*8)/2)
-        let layout = UICollectionViewFlowLayout()
-        layout.minimumLineSpacing = 8
-        layout.minimumInteritemSpacing = 8
-        layout.scrollDirection = .vertical
-        layout.itemSize = celSize
+    private lazy var layout = WaterfallLayout(with: self)
+
+    private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        collectionView.register(PhotosCell.self, forCellWithReuseIdentifier: PhotosCell.reuseIdentifier)
+        collectionView.register(PagingView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: PagingView.reuseIdentifier)
+        collectionView.contentInsetAdjustmentBehavior = .automatic
+        collectionView.layoutMargins = UIEdgeInsets(top: 0.0, left: 16.0, bottom: 0.0, right: 16.0)
         collectionView.backgroundColor = .white
         return collectionView
     }()
@@ -64,11 +66,18 @@ class PhotosViewController: UIViewController {
     }
     
     private func setupCollectionView() {
-        collectionView.delegate = self
-        collectionView.dataSource = self
+        collectionView.backgroundColor = .white
+        
+        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "CellId")
         collectionView.register(PhotosCell.self, forCellWithReuseIdentifier: PhotosCell.reuseIdentifier)
+        
         collectionView.layoutMargins = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         collectionView.contentInsetAdjustmentBehavior = .automatic
+        collectionView.allowsMultipleSelection = true
+        
+        if let waterfallLayout = collectionView.collectionViewLayout as? WaterfallLayout {
+            waterfallLayout.delegate = self
+        }
     }
     
     private func setupNavigationController() {
@@ -159,5 +168,12 @@ extension PhotosViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
         return sectionInserts.left
+    }
+}
+
+extension PhotosViewController: WaterfallLayoutDelegate {
+    func waterfallLayout(_ layout: WaterfallLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let photo = photos[indexPath.item]
+        return CGSize(width: photo.width, height: photo.height)
     }
 }
