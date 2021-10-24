@@ -7,7 +7,13 @@
 
 import Foundation
 
-class NetworkService {
+protocol NetworkService {
+    func searchRequest(searchTerm: String, completion: @escaping (Data?, Error?) -> Void)
+    func photoDetailsRequest(photoId: String, completion: @escaping (Data?, Error?) -> Void)
+    func randomPhotoRequest(completion: @escaping (Data?, Error?) -> Void)
+}
+
+class UnsplashNetworkService: NetworkService {
     
     func searchRequest(searchTerm: String, completion: @escaping (Data?, Error?) -> Void) {
         let parameters = self.prepareSearchParameters(searchTerm: searchTerm)

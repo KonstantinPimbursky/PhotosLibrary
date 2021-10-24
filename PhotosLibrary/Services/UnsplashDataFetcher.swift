@@ -7,9 +7,19 @@
 
 import Foundation
 
-class NetworkDataFetcher {
+protocol NetworkDataFetcher {
+    func fetchImages(searchTerm: String, completion: @escaping (SearchResults?) -> Void)
+    func fetchPhotoDetails(photoId: String, completion: @escaping (PhotoDetails?) -> Void)
+    func fetchRandomPhotos(completion: @escaping ([UnsplashPhoto]?) -> Void)
+}
+
+class UnsplashDataFetcher: NetworkDataFetcher {
     
-    var networkService = NetworkService()
+    private let networkService: NetworkService
+    
+    init(networkService: NetworkService) {
+        self.networkService = networkService
+    }
     
     func fetchImages(searchTerm: String, completion: @escaping (SearchResults?) -> Void) {
         networkService.searchRequest(searchTerm: searchTerm) { (data, error) in

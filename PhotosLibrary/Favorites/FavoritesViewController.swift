@@ -9,8 +9,8 @@ import UIKit
 
 class FavoritesViewController: UIViewController {
     
-    private let realmService = RealmDataBaseService()
     private let coordinator: Coordinator
+    private let viewModel: FavoritesViewInput
     
     private let tableView: UITableView = {
         let table = UITableView()
@@ -30,8 +30,10 @@ class FavoritesViewController: UIViewController {
     
     private var savedPhotos = [PhotoRealmObject]()
     
-    init(coordinator: Coordinator) {
+    init(coordinator: Coordinator,
+         viewModel: FavoritesViewInput) {
         self.coordinator = coordinator
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -42,7 +44,7 @@ class FavoritesViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        savedPhotos = realmService.getSavedPhotos()
+        savedPhotos = viewModel.getSavedPhotos()
         setupSubviews()
     }
     
@@ -94,7 +96,7 @@ extension FavoritesViewController: UITableViewDelegate, UITableViewDataSource {
 
 extension FavoritesViewController: ReloadData {
     func reloadData() {
-        
+        savedPhotos = viewModel.getSavedPhotos()
         tableView.reloadData()
     }
 }

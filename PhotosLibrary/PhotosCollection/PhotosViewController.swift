@@ -9,7 +9,7 @@ import UIKit
 
 class PhotosViewController: UIViewController {
     
-    var networkDataFetcher = NetworkDataFetcher()
+    private let viewModel: PhotosViewInput
     
     private let coordinator: Coordinator
     
@@ -34,8 +34,10 @@ class PhotosViewController: UIViewController {
         return collectionView
     }()
     
-    init(coordinator: Coordinator) {
+    init(coordinator: Coordinator,
+         viewModel: PhotosViewInput) {
         self.coordinator = coordinator
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -55,9 +57,8 @@ class PhotosViewController: UIViewController {
     }
     
     private func getRandomPhotos() {
-        networkDataFetcher.fetchRandomPhotos { [weak self] randomPhotos in
-            guard let fetchedPhotos = randomPhotos else { return }
-            self?.photos = fetchedPhotos
+        viewModel.getRandomPhotos { [weak self] randomPhotos in
+            self?.photos = randomPhotos
             self?.collectionView.reloadData()
         }
     }
@@ -130,11 +131,10 @@ extension PhotosViewController: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         print(searchText)
-        
+        timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { [weak self] _ in
-            self?.networkDataFetcher.fetchImages(searchTerm: searchText) { [weak self] searchResults in
-                guard let fetchedPhotos = searchResults else { return }
-                self?.photos = fetchedPhotos.results
+            self?.viewModel.searchPhotos(by: searchText) { [weak self] searchResults in
+                self?.photos = searchResults.results
                 self?.collectionView.reloadData()
             }
         })

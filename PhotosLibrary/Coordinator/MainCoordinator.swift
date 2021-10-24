@@ -21,10 +21,15 @@ protocol ReloadData {
 class MainCoordinator {
     
     private let tabBarController: UITabBarController
-    var delegate: ReloadData?
+    private let unsplashDataFetcher: NetworkDataFetcher
+    private let realmService: RealmService
     
-    init(tabBarController: UITabBarController) {
+    init(tabBarController: UITabBarController,
+         unsplashDataFetcher: NetworkDataFetcher,
+         realmService: RealmService) {
         self.tabBarController = tabBarController
+        self.unsplashDataFetcher = unsplashDataFetcher
+        self.realmService = realmService
     }
     
     func start() {
@@ -42,10 +47,18 @@ class MainCoordinator {
             favoritesNavigationController
         ]
         
-        let photosCoordinator = ChildCoordinator(navigationController: photosNavigationController)
-        let favoritesCoordinator = ChildCoordinator(navigationController: favoritesNavigationController)
-        let photosViewController = PhotosViewController(coordinator: photosCoordinator)
-        let favoritesViewController = FavoritesViewController(coordinator: favoritesCoordinator)
+        let photosViewModel = PhotosViewModel(dataFetncher: unsplashDataFetcher)
+        let photosCoordinator = ChildCoordinator(navigationController: photosNavigationController,
+                                                 dataFetcher: unsplashDataFetcher,
+                                                 realmService: realmService)
+        let photosViewController = PhotosViewController(coordinator: photosCoordinator, viewModel: photosViewModel)
+        
+        let favoritesViewModel = FavoritesViewModel(realmService: realmService)
+        let favoritesCoordinator = ChildCoordinator(navigationController: favoritesNavigationController,
+                                                    dataFetcher: unsplashDataFetcher,
+                                                    realmService: realmService)
+        let favoritesViewController = FavoritesViewController(coordinator: favoritesCoordinator,
+                                                              viewModel: favoritesViewModel)
 
         photosNavigationController.viewControllers = [photosViewController]
         favoritesNavigationController.viewControllers = [favoritesViewController]

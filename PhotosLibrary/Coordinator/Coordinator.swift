@@ -10,17 +10,25 @@ import UIKit
 class ChildCoordinator: Coordinator {
     
     private let navigationController: UINavigationController
+    private let dataFetcher: NetworkDataFetcher
+    private let realmService: RealmService
     var delegate: ReloadData?
     
-    init(navigationController: UINavigationController) {
+    init(navigationController: UINavigationController,
+         dataFetcher: NetworkDataFetcher,
+         realmService: RealmService) {
         self.navigationController = navigationController
+        self.dataFetcher = dataFetcher
+        self.realmService = realmService
     }
     
     func showDetailedViewController(photoId: String, profileImageUrl: String) {
-        let detailedViewController = DetailedInformationViewController(photoId: photoId, profileImageUrl: profileImageUrl)
-        detailedViewController.delegate = delegate
+        let viewModel = DetailedInformationViewModel(realmService: realmService,
+                                                     dataFetcher: dataFetcher,
+                                                     photoId: photoId,
+                                                     profileImageUrl: profileImageUrl)
+        viewModel.delegate = delegate
+        let detailedViewController = DetailedInformationViewController(viewModel: viewModel)
         navigationController.pushViewController(detailedViewController, animated: true)
     }
-    
-    
 }

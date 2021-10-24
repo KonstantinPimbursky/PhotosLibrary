@@ -15,7 +15,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         if let windowScene = scene as? UIWindowScene {
             let window = UIWindow(windowScene: windowScene)
             let tabBarController = MainTabBarController()
-            let coordinator = MainCoordinator(tabBarController: tabBarController)
+            let networkService = UnsplashNetworkService()
+            let dataFetcher = UnsplashDataFetcher(networkService: networkService)
+            let realmService = RealmDataBaseService()
+            let coordinator = MainCoordinator(tabBarController: tabBarController,
+                                              unsplashDataFetcher: dataFetcher,
+                                              realmService: realmService)
             coordinator.start()
             window.backgroundColor = .white
             window.rootViewController = tabBarController

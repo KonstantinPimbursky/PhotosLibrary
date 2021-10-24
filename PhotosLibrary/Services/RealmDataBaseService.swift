@@ -27,8 +27,14 @@ class PhotoRealmObject: Object {
     }
 }
 
+protocol RealmService {
+    func savePhoto(id: String, url: String, userName: String, userProfileUrl: String) -> Void
+    func getSavedPhotos() -> [PhotoRealmObject]
+    func deletePhoto(id: String) -> Void
+}
+
 // MARK: - Realm Service
-class RealmDataBaseService {
+class RealmDataBaseService: RealmService {
     
     private let localRealm = try! Realm()
     

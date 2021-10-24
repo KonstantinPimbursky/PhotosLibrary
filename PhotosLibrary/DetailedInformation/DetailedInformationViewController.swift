@@ -11,15 +11,7 @@ import SDWebImage
 class DetailedInformationViewController: UIViewController {
 
 // MARK: - PROPERTIES
-    private let networkDataFetcher = NetworkDataFetcher()
-    private let realmService = RealmDataBaseService()
-    
-    private let profileImageUrl: String
-    private var photoDetails: PhotoDetails! {
-        didSet {
-            fillLabels()
-        }
-    }
+    private let viewModel: DetailedInformationInput
     
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
@@ -121,16 +113,11 @@ class DetailedInformationViewController: UIViewController {
         return button
     }()
     
-    var delegate: ReloadData?
-    
 // MARK: - INIT
     
-    init(photoId: String, profileImageUrl: String) {
-        self.profileImageUrl = profileImageUrl
+    init(viewModel: DetailedInformationInput) {
+        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
-        networkDataFetcher.fetchPhotoDetails(photoId: photoId) { [weak self] photo in
-            self?.photoDetails = photo
-        }
     }
     
     required init?(coder: NSCoder) {
@@ -142,23 +129,20 @@ class DetailedInformationViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupSubviews()
+        viewModel.getDetailsOfPhoto { [weak self] photo in
+            guard photo != nil else { return }
+            self?.fillLabels(photo: photo!)
+        }
     }
     
     @objc private func favouriteButtonTapped() {
         let imageConfiguration = UIImage.SymbolConfiguration(scale: .large)
-        guard let photo = photoDetails else { return }
-        guard delegate != nil else { return }
         if favouriteButton.currentImage == UIImage(systemName: "heart", withConfiguration: imageConfiguration) {
             self.photoIsLiked()
-            realmService.savePhoto(id: photo.id,
-                                   url: photo.urls.small,
-                                   userName: photo.user.name,
-                                   userProfileUrl: profileImageUrl)
-            delegate!.reloadData()
+            viewModel.savePhoto()
         } else {
             self.photoIsUnliked()
-            realmService.deletePhoto(id: photo.id)
-            delegate!.reloadData()
+            viewModel.deletePhoto()
         }
     }
     
@@ -176,16 +160,15 @@ class DetailedInformationViewController: UIViewController {
         favouriteButton.tintColor = .systemGray
     }
     
-    private func fillLabels() {
-        guard let photo = photoDetails else { return }
-        let savedPhotos = realmService.getSavedPhotos()
+    private func fillLabels(photo: PhotoDetails) {
+        let savedPhotos = viewModel.getSavedPhotos()
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
         let date = formatter.date(from: photo.createdAt)!
         formatter.dateFormat = "dd.MM.yyyy"
-        userProfileImageView.sd_setImage(with: URL(string: profileImageUrl), completed: nil)
-        photoImageView.sd_setImage(with: URL(string: photoDetails.urls.regular), completed: nil)
-        authorLabel.text = photoDetails.user.name
+        userProfileImageView.sd_setImage(with: URL(string: viewModel.getProfileImageUrl()), completed: nil)
+        photoImageView.sd_setImage(with: URL(string: photo.urls.regular), completed: nil)
+        authorLabel.text = photo.user.name
         downloadsLabel.text = "\(photo.downloads)"
         createdDateLabel.text = formatter.string(from: date)
         if photo.location.city != nil {
