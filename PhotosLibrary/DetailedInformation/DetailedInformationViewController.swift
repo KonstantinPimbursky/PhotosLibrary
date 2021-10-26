@@ -128,6 +128,7 @@ class DetailedInformationViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .white
         setupSubviews()
         viewModel.getDetailsOfPhoto { [weak self] photo in
             guard photo != nil else { return }

@@ -129,6 +129,7 @@ extension PhotosViewController: UICollectionViewDelegate, UICollectionViewDataSo
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
         coordinator.showDetailedViewController(photoId: photos[indexPath.item].id,
                                                profileImageUrl: photos[indexPath.item].user.profileImage.small)
     }
