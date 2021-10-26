@@ -166,8 +166,8 @@
 			isa = PBXGroup;
 			children = (
 				B506F3852721EE0B00162787 /* Coordinator */,
-				B506F3802720856300162787 /* Favorites */,
 				B506F368271C9E3700162787 /* PhotosCollection */,
+				B506F3802720856300162787 /* Favorites */,
 				B506F377271DEE5300162787 /* DetailedInformation */,
 				B506F36D271CAE7A00162787 /* Services */,
 				B506F372271DCE2500162787 /* Models */,

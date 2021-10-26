@@ -139,7 +139,6 @@ extension PhotosViewController: UICollectionViewDelegate, UICollectionViewDataSo
 extension PhotosViewController: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        print(searchText)
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { [weak self] _ in
             self?.viewModel.searchPhotos(by: searchText) { [weak self] searchResults in
@@ -148,28 +147,15 @@ extension PhotosViewController: UISearchBarDelegate {
             }
         })
     }
+    
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        if photos.isEmpty {
+            getRandomPhotos()
+        }
+    }
 }
 
-// MARK: - UICollectionViewDelegateFlowLayout
-extension PhotosViewController: UICollectionViewDelegateFlowLayout {
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let photo = photos[indexPath.item]
-        let paddingSpace = sectionInserts.left * (itemsPerRow + 1)
-        let availableWidth = view.frame.width - paddingSpace
-        let widthPerItem = availableWidth / itemsPerRow
-        let height = CGFloat(photo.height) * widthPerItem / CGFloat(photo.width)
-        return CGSize(width: widthPerItem, height: height)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-        return sectionInserts
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return sectionInserts.left
-    }
-}
+// MARK: - WaterfallLayoutDelegate
 
 extension PhotosViewController: WaterfallLayoutDelegate {
     func waterfallLayout(_ layout: WaterfallLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
