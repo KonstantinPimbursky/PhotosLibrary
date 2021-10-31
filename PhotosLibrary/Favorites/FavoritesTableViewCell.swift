@@ -10,7 +10,7 @@ import SDWebImage
 
 class FavoritesTableViewCell: UITableViewCell {
     
-    var photo: PhotoRealmObject! {
+    var photo: PhotoRealmObject? {
         didSet {
             fillLabels()
         }
@@ -61,6 +61,7 @@ class FavoritesTableViewCell: UITableViewCell {
     }
     
     private func fillLabels() {
+        guard let photo = photo else { return }
         photoImageView.sd_setImage(with: URL(string: photo.url), completed: nil)
         userNameLabel.text = photo.userName
     }

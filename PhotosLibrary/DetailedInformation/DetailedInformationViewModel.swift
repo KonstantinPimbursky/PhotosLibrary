@@ -43,19 +43,19 @@ class DetailedInformationViewModel: DetailedInformationInput {
     
     func savePhoto() {
         guard let photo = photoDetails else { return }
-        guard delegate != nil else { return }
+        guard let delegate = delegate else { return }
         realmService.savePhoto(id: photo.id,
                                url: photo.urls.small,
                                userName: photo.user.name,
                                userProfileUrl: profileImageUrl)
-        delegate!.reloadData()
+        delegate.reloadData()
     }
     
     func deletePhoto() {
         guard let photo = photoDetails else { return }
-        guard delegate != nil else { return }
+        guard let delegate = delegate else { return }
         realmService.deletePhoto(id: photo.id)
-        delegate!.reloadData()
+        delegate.reloadData()
     }
     
     func getSavedPhotos() -> [PhotoRealmObject] {

@@ -131,8 +131,8 @@ class DetailedInformationViewController: UIViewController {
         view.backgroundColor = .white
         setupSubviews()
         viewModel.getDetailsOfPhoto { [weak self] photo in
-            guard photo != nil else { return }
-            self?.fillLabels(photo: photo!)
+            guard let photo = photo else { return }
+            self?.fillLabels(photo: photo)
         }
     }
     
@@ -165,21 +165,21 @@ class DetailedInformationViewController: UIViewController {
         let savedPhotos = viewModel.getSavedPhotos()
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-        let date = formatter.date(from: photo.createdAt)!
+        guard let date = formatter.date(from: photo.createdAt) else { return }
         formatter.dateFormat = "dd.MM.yyyy"
         userProfileImageView.sd_setImage(with: URL(string: viewModel.getProfileImageUrl()), completed: nil)
         photoImageView.sd_setImage(with: URL(string: photo.urls.regular), completed: nil)
         authorLabel.text = photo.user.name
         downloadsLabel.text = "\(photo.downloads)"
         createdDateLabel.text = formatter.string(from: date)
-        if photo.location.city != nil {
-            locationLabel.text = photo.location.city! + ", " + photo.location.country!
-        } else {
-            if photo.location.country != nil {
-                locationLabel.text = photo.location.country!
+        if let country = photo.location.country {
+            if let city = photo.location.city {
+                locationLabel.text = city + ", " + country
             } else {
-                locationLabel.text = "-"
+                locationLabel.text = country
             }
+        } else {
+            locationLabel.text = "-"
         }
         if savedPhotos.contains(where: { $0.id == photo.id}) {
             self.photoIsLiked()

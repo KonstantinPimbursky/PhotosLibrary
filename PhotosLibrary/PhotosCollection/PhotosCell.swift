@@ -20,9 +20,10 @@ class PhotosCell: UICollectionViewCell {
         return imageView
     }()
     
-    var unsplashPhoto: UnsplashPhoto! {
+    var unsplashPhoto: UnsplashPhoto? {
         didSet {
-            let photoUrl = unsplashPhoto.urls.regular
+            guard let photo = unsplashPhoto else { return }
+            let photoUrl = photo.urls.regular
             guard let url = URL(string: photoUrl) else { return }
             photoImageView.sd_setImage(with: url, completed: nil)
         }
