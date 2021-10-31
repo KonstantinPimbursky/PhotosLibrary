@@ -7,29 +7,17 @@
 
 import UIKit
 
+protocol FavoritesViewControllerDelegate {
+    func showNextViewController(photoId: String, profileImageUrl: String) -> Void
+    func loadData() -> [PhotoRealmObject]
+}
+
 class FavoritesViewController: UIViewController {
-    
+    // MARK: - Properties
     private let coordinator: Coordinator
     private let viewModel: FavoritesViewInput
     
-    private let tableView: UITableView = {
-        let table = UITableView()
-        table.translatesAutoresizingMaskIntoConstraints = false
-        table.register(FavoritesTableViewCell.self, forCellReuseIdentifier: "Cell")
-        return table
-    }()
-    
-    private let notSavedYetLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Вы еще не сохранили ни одной фотографии"
-        label.textColor = .systemGray
-        label.font = UIFont.systemFont(ofSize: 18, weight: .regular)
-        return label
-    }()
-    
-    private var savedPhotos = [PhotoRealmObject]()
-    
+    // MARK: - Init
     init(coordinator: Coordinator,
          viewModel: FavoritesViewInput) {
         self.coordinator = coordinator
@@ -41,62 +29,36 @@ class FavoritesViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Functions
+    override func loadView() {
+        let favoritiesView = FavoritesView()
+        favoritiesView.delegate = self
+        self.view = favoritiesView
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
-        savedPhotos = viewModel.getSavedPhotos()
-        setupSubviews()
     }
     
-    
-    private func setupSubviews() {
-        var constraints = [NSLayoutConstraint]()
-        if savedPhotos.isEmpty {
-            view.addSubview(notSavedYetLabel)
-            constraints = [
-                notSavedYetLabel.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
-                notSavedYetLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor)
-            ]
-        } else {
-            tableView.delegate = self
-            tableView.dataSource = self
-            view.addSubview(tableView)
-            constraints = [
-                tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-                tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-                tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-                tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-            ]
-        }
-        NSLayoutConstraint.activate(constraints)
+    func view() -> FavoritesView {
+        return self.view as! FavoritesView
     }
 }
 
-extension FavoritesViewController: UITableViewDelegate, UITableViewDataSource {
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return savedPhotos.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! FavoritesTableViewCell
-        cell.photo = savedPhotos[indexPath.item]
-        return cell
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        coordinator.showDetailedViewController(photoId: savedPhotos[indexPath.item].id,
-                                               profileImageUrl: savedPhotos[indexPath.item].userProfileUrl)
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 70
-    }
-}
-
+// MARK: - Extensions
 extension FavoritesViewController: ReloadData {
     func reloadData() {
-        savedPhotos = viewModel.getSavedPhotos()
-        tableView.reloadData()
+        view().reloadData()
+    }
+}
+
+extension FavoritesViewController: FavoritesViewControllerDelegate {
+    func loadData() -> [PhotoRealmObject] {
+        return viewModel.getSavedPhotos()
+    }
+    
+    func showNextViewController(photoId: String, profileImageUrl: String) {
+        coordinator.showDetailedViewController(photoId: photoId,
+                                               profileImageUrl: profileImageUrl)
     }
 }
