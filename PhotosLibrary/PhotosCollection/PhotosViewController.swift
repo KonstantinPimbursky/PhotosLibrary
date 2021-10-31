@@ -7,33 +7,19 @@
 
 import UIKit
 
+protocol PhotosViewControllerDelegate {
+    func showNextViewController(photoId: String, profileImageUrl: String) -> Void
+    func loadRandomPhotos(completion: @escaping ([UnsplashPhoto]) -> Void)
+    func searchPhoto(by searchText: String, completion: @escaping (SearchResults) -> Void) -> Void
+}
+
 class PhotosViewController: UIViewController {
     
+    //MARK: - Properties
     private let viewModel: PhotosViewInput
     private let coordinator: Coordinator
     
-    private var timer: Timer?
-    
-    private var photos = [UnsplashPhoto]()
-    
-    private let itemsPerRow: CGFloat = 2
-    
-    private let sectionInserts = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)
-    
-    private lazy var layout = WaterfallLayout(with: self)
-
-    private lazy var collectionView: UICollectionView = {
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.dataSource = self
-        collectionView.delegate = self
-        collectionView.register(PhotosCell.self, forCellWithReuseIdentifier: PhotosCell.reuseIdentifier)
-        collectionView.contentInsetAdjustmentBehavior = .automatic
-        collectionView.layoutMargins = UIEdgeInsets(top: 0.0, left: 16.0, bottom: 0.0, right: 16.0)
-        collectionView.backgroundColor = .white
-        return collectionView
-    }()
-    
+    //MARK: - Init
     init(coordinator: Coordinator,
          viewModel: PhotosViewInput) {
         self.coordinator = coordinator
@@ -45,37 +31,19 @@ class PhotosViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
         
+    //MARK: - Functions
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
         navigationController?.navigationBar.isTranslucent = false
-        getRandomPhotos()
-        setupSubviews()
-        setupCollectionView()
         setupNavigationController()
         setupSearchBar()
     }
     
-    private func getRandomPhotos() {
-        viewModel.getRandomPhotos { [weak self] randomPhotos in
-            self?.photos = randomPhotos
-            self?.collectionView.reloadData()
-        }
-    }
-    
-    private func setupCollectionView() {
-        collectionView.backgroundColor = .white
-        
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "CellId")
-        collectionView.register(PhotosCell.self, forCellWithReuseIdentifier: PhotosCell.reuseIdentifier)
-        
-        collectionView.layoutMargins = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-        collectionView.contentInsetAdjustmentBehavior = .automatic
-        collectionView.allowsMultipleSelection = true
-        
-        if let waterfallLayout = collectionView.collectionViewLayout as? WaterfallLayout {
-            waterfallLayout.delegate = self
-        }
+    override func loadView() {
+        let photosView = PhotosView()
+        photosView.delegate = self
+        self.view = photosView
     }
     
     private func setupNavigationController() {
@@ -88,77 +56,29 @@ class PhotosViewController: UIViewController {
     
     private func setupSearchBar() {
         let searchController = UISearchController(searchResultsController: nil)
-        searchController.searchBar.delegate = self
+        searchController.searchBar.delegate = view()
         navigationItem.searchController = searchController
         navigationItem.hidesSearchBarWhenScrolling = false
     }
     
-    private func setupSubviews() {
-        view.addSubview(collectionView)
-        
-        let constraints = [
-            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ]
-        
-        NSLayoutConstraint.activate(constraints)
-    }
-
-}
-
-// MARK: - UICollectionViewDelegate, UICollectionViewDataSource
-extension PhotosViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return photos.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotosCell.reuseIdentifier, for: indexPath) as! PhotosCell
-        let unsplashPhoto = photos[indexPath.item]
-        cell.unsplashPhoto = unsplashPhoto
-        cell.backgroundColor = .red
-        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        collectionView.deselectItem(at: indexPath, animated: true)
-        coordinator.showDetailedViewController(photoId: photos[indexPath.item].id,
-                                               profileImageUrl: photos[indexPath.item].user.profileImage.small)
+    private func view() -> PhotosView {
+        return self.view as! PhotosView
     }
 }
 
-// MARK: - UISearchBarDelegate
+// MARK: - PhotosViewControllerDelegate
 
-extension PhotosViewController: UISearchBarDelegate {
-    
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 2, repeats: false, block: { [weak self] _ in
-            self?.viewModel.searchPhotos(by: searchText) { [weak self] searchResults in
-                self?.photos = searchResults.results
-                self?.collectionView.reloadData()
-            }
-        })
+extension PhotosViewController: PhotosViewControllerDelegate {
+    func searchPhoto(by searchText: String, completion: @escaping (SearchResults) -> Void) {
+        self.viewModel.searchPhotos(by: searchText, completion: completion)
     }
     
-    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-        if photos.isEmpty {
-            getRandomPhotos()
-        }
+    func showNextViewController(photoId: String, profileImageUrl: String) {
+        coordinator.showDetailedViewController(photoId: photoId,
+                                               profileImageUrl: profileImageUrl)
     }
-}
-
-// MARK: - WaterfallLayoutDelegate
-
-extension PhotosViewController: WaterfallLayoutDelegate {
-    func waterfallLayout(_ layout: WaterfallLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let photo = photos[indexPath.item]
-        return CGSize(width: photo.width, height: photo.height)
+    
+    func loadRandomPhotos(completion: @escaping ([UnsplashPhoto]) -> Void) {
+        viewModel.getRandomPhotos(completion: completion)
     }
 }

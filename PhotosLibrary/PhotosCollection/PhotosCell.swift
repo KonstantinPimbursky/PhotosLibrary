@@ -56,6 +56,7 @@ class PhotosCell: UICollectionViewCell {
     
     private func setupSubviews() {
         contentView.addSubview(photoImageView)
+        contentView.clipsToBounds = true
         
         let constraints = [
             photoImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
