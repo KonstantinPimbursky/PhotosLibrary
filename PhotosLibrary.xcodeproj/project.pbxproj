@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -23,13 +23,13 @@
 		B506F38D27241FB100162787 /* PhotosViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B506F38C27241FB100162787 /* PhotosViewModel.swift */; };
 		B506F38F2724289100162787 /* DetailedInformationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B506F38E2724289100162787 /* DetailedInformationViewModel.swift */; };
 		B506F3912725C06F00162787 /* FavoritesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B506F3902725C06F00162787 /* FavoritesViewModel.swift */; };
-		B506F3BB2725CF3000162787 /* WaterfallLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = B506F3BA2725CF3000162787 /* WaterfallLayout.swift */; };
-		B506F3BD2725CF5400162787 /* PagingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B506F3BC2725CF5400162787 /* PagingView.swift */; };
 		B5E95F9C271C94C600AF30F7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E95F9B271C94C600AF30F7 /* AppDelegate.swift */; };
 		B5E95F9E271C94C600AF30F7 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E95F9D271C94C600AF30F7 /* SceneDelegate.swift */; };
 		B5E95FA5271C94C600AF30F7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5E95FA4271C94C600AF30F7 /* Assets.xcassets */; };
 		B5E95FA8271C94C600AF30F7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5E95FA6271C94C600AF30F7 /* LaunchScreen.storyboard */; };
 		B5F1BECB272E75F50022C840 /* FavoritesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F1BECA272E75F50022C840 /* FavoritesView.swift */; };
+		B5F1BECD272ED6510022C840 /* PhotosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5F1BECC272ED6510022C840 /* PhotosView.swift */; };
+		B5F1BED0272EDD030022C840 /* CHTCollectionViewWaterfallLayout in Frameworks */ = {isa = PBXBuildFile; productRef = B5F1BECF272EDD030022C840 /* CHTCollectionViewWaterfallLayout */; };
 		F468EE72AEDC681C3917D84C /* Pods_PhotosLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C26F342B8378F6B226192068 /* Pods_PhotosLibrary.framework */; };
 /* End PBXBuildFile section */
 
@@ -51,8 +51,6 @@
 		B506F38C27241FB100162787 /* PhotosViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosViewModel.swift; sourceTree = "<group>"; };
 		B506F38E2724289100162787 /* DetailedInformationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailedInformationViewModel.swift; sourceTree = "<group>"; };
 		B506F3902725C06F00162787 /* FavoritesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesViewModel.swift; sourceTree = "<group>"; };
-		B506F3BA2725CF3000162787 /* WaterfallLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterfallLayout.swift; sourceTree = "<group>"; };
-		B506F3BC2725CF5400162787 /* PagingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PagingView.swift; sourceTree = "<group>"; };
 		B5E95F98271C94C600AF30F7 /* PhotosLibrary.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PhotosLibrary.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5E95F9B271C94C600AF30F7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B5E95F9D271C94C600AF30F7 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -60,6 +58,7 @@
 		B5E95FA7271C94C600AF30F7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B5E95FA9271C94C600AF30F7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B5F1BECA272E75F50022C840 /* FavoritesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesView.swift; sourceTree = "<group>"; };
+		B5F1BECC272ED6510022C840 /* PhotosView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosView.swift; sourceTree = "<group>"; };
 		C26F342B8378F6B226192068 /* Pods_PhotosLibrary.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhotosLibrary.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEF2261368BA4B93E1C960B4 /* Pods-PhotosLibrary.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhotosLibrary.debug.xcconfig"; path = "Target Support Files/Pods-PhotosLibrary/Pods-PhotosLibrary.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -69,6 +68,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5F1BED0272EDD030022C840 /* CHTCollectionViewWaterfallLayout in Frameworks */,
 				F468EE72AEDC681C3917D84C /* Pods_PhotosLibrary.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -89,10 +89,9 @@
 			isa = PBXGroup;
 			children = (
 				B506F36B271CA40700162787 /* PhotosViewController.swift */,
+				B5F1BECC272ED6510022C840 /* PhotosView.swift */,
 				B506F375271DDC5E00162787 /* PhotosCell.swift */,
 				B506F38C27241FB100162787 /* PhotosViewModel.swift */,
-				B506F3BA2725CF3000162787 /* WaterfallLayout.swift */,
-				B506F3BC2725CF5400162787 /* PagingView.swift */,
 			);
 			path = PhotosCollection;
 			sourceTree = "<group>";
@@ -208,6 +207,9 @@
 			dependencies = (
 			);
 			name = PhotosLibrary;
+			packageProductDependencies = (
+				B5F1BECF272EDD030022C840 /* CHTCollectionViewWaterfallLayout */,
+			);
 			productName = PhotosLibrary;
 			productReference = B5E95F98271C94C600AF30F7 /* PhotosLibrary.app */;
 			productType = "com.apple.product-type.application";
@@ -235,6 +237,9 @@
 				Base,
 			);
 			mainGroup = B5E95F8F271C94C600AF30F7;
+			packageReferences = (
+				B5F1BECE272EDD030022C840 /* XCRemoteSwiftPackageReference "CHTCollectionViewWaterfallLayout" */,
+			);
 			productRefGroup = B5E95F99271C94C600AF30F7 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -306,18 +311,17 @@
 				B506F3822720858500162787 /* FavoritesViewController.swift in Sources */,
 				B506F37F27207A4C00162787 /* RealmDataBaseService.swift in Sources */,
 				B506F371271DCDCC00162787 /* UnsplashDataFetcher.swift in Sources */,
-				B506F3BD2725CF5400162787 /* PagingView.swift in Sources */,
 				B506F389272201BB00162787 /* Coordinator.swift in Sources */,
 				B506F38F2724289100162787 /* DetailedInformationViewModel.swift in Sources */,
 				B5E95F9C271C94C600AF30F7 /* AppDelegate.swift in Sources */,
 				B506F379271DEE8900162787 /* DetailedInformationViewController.swift in Sources */,
-				B506F3BB2725CF3000162787 /* WaterfallLayout.swift in Sources */,
 				B506F38D27241FB100162787 /* PhotosViewModel.swift in Sources */,
 				B506F367271C9A3A00162787 /* MainTabBarController.swift in Sources */,
 				B5F1BECB272E75F50022C840 /* FavoritesView.swift in Sources */,
 				B5E95F9E271C94C600AF30F7 /* SceneDelegate.swift in Sources */,
 				B506F36F271CAE8F00162787 /* UnsplashNetworkService.swift in Sources */,
 				B506F37B271DF8E200162787 /* PhotoDetails.swift in Sources */,
+				B5F1BECD272ED6510022C840 /* PhotosView.swift in Sources */,
 				B506F374271DCE3B00162787 /* SearchResults.swift in Sources */,
 				B506F36C271CA40700162787 /* PhotosViewController.swift in Sources */,
 				B506F376271DDC5E00162787 /* PhotosCell.swift in Sources */,
@@ -519,6 +523,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B5F1BECE272EDD030022C840 /* XCRemoteSwiftPackageReference "CHTCollectionViewWaterfallLayout" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AfrazCodes/CHTCollectionViewWaterfallLayout";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.8;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B5F1BECF272EDD030022C840 /* CHTCollectionViewWaterfallLayout */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B5F1BECE272EDD030022C840 /* XCRemoteSwiftPackageReference "CHTCollectionViewWaterfallLayout" */;
+			productName = CHTCollectionViewWaterfallLayout;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B5E95F90271C94C600AF30F7 /* Project object */;
 }
